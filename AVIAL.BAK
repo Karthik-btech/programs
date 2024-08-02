@@ -1,0 +1,125 @@
+#include<stdio.h>
+#include<stdlib.h>
+struct node
+{
+int data;
+struct node *left,*right;
+int height;
+};
+struct node *rightrotate(struct node*);
+struct node *leftrotate(struct node*);
+
+int getheight(struct node*n)
+{
+if(n==NULL)
+{
+return 0;
+}
+else
+{
+return n->height;
+}
+}
+int getbalfactor(struct node *n)
+{
+if(n==NULL)
+{
+return 0;
+}
+else
+{
+return getheight(n->left) - getheight(n->right);
+}
+}
+struct node *createnode(int ele)
+{
+struct node *newnode;
+newnode=(struct node*)malloc(sizeof(struct node));
+newnode->data=ele;
+newnode->left=NULL;
+newnode->right=NULL;
+newnode->height=1;
+return newnode;
+}
+int largest(int a,int b)
+{
+return a>b?a:b;
+}
+struct node *insert(struct node *r,int ele)
+{
+int bf;
+if(r==NULL)
+{
+return createnode(ele);
+}
+else if(ele>r->data)
+r->right=insert(r->right,ele);
+else if(ele < r->data)
+r->left=insert(r->left,ele);
+r->height=1+largest(getheight(r->left),getheight(r->right));
+bf=getbalfactor(r);
+if(bf>1 && ele< r->left->data)
+{
+return rightrotate(r);
+}
+if(bf>1 && ele > r->left->data)
+{
+r->left=leftrotate(r->left);
+return rightrotate(r);
+}
+if(bf<-1 && ele>r->right->data)
+{
+return leftrotate(r);
+}
+if(bf<-1 && ele<r->right->data)
+{
+r->right=rightrotate(r->right);
+return leftrotate(r);
+}
+return r;
+}
+struct node *leftrotate(struct node *r)
+{
+struct node *n1,*n2;
+n1=r->right;
+n2=n1->left;
+n1->left=r;
+r->right=n2;
+r->height=1+largest(getheight(r->left),getheight(r->right));
+n1->height=1+largest(getheight(n1->left),getheight(n1->right));
+return n1;
+}
+struct node *rightrotate(struct node *r)
+{
+struct node *n1,*n2;
+n1=r->left;
+n2=n1->right;
+n1->right=r;
+r->left=n2;
+r->height=1+largest(getheight(r->left),getheight(r->right));
+n1->height=1+largest(getheight(n1->left),getheight(n1->right));
+return n1;
+}
+void preorder(struct node *r)
+{
+if(r!=NULL)
+{
+printf("%d",r->data);
+preorder(r->left);
+preorder(r->right);
+}
+}
+void main()
+{
+struct node *root=NULL;
+int a[20],n,i;
+printf("Enter array size \n");
+scanf("%d",&n);
+printf("Enter array elements\n");
+for(i=0;i<n;i++)
+{
+scanf("%d",&a[i]);
+root=insert(root,a[i]);
+}
+preorder(root);
+}
